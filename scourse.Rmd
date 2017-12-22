@@ -71,11 +71,11 @@ ds2[is.na(ds2$steps),1] = predict(imput_model,ds2[is.na(ds2$steps),c(2,3)])
 histdata2 = ds2  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
 
 par(mfrow=c(1,2))
-hist(histdata2$n_steps,main = 'Total number of steps taken each day', xlab = 'Total number of steps',breaks = 8)
+hist(histdata2$n_steps,main = 'Imputed NAs ', xlab = 'Total number of steps',breaks = 8)
 
-hist(histdata$n_steps,main = 'Total number of steps taken each day', xlab = 'Total number of steps',breaks = 8)
+hist(histdata$n_steps,main = 'Data with NAs ', xlab = 'Total number of steps',breaks = 8,)
 ```
 
-
+## Weekdays vw Weekends
 
 
