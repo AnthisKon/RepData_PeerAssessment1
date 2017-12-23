@@ -1,19 +1,8 @@
----
-title: "PA1_template"
-author: "Konstantinos"
-date: "23 December 2017"
-output: 
-  html_document:
-    keep_md: true
-    toc: true
-    toc_float: true
-    code_folding: show
-    theme: spacelab
----
+# PA1_template
+Konstantinos  
+23 December 2017  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Intro
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the "quantified self" movement -- a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
@@ -22,18 +11,27 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 ## Loading and preprocessing the data
 
-```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+
+```r
 library(dplyr)
 library(ggplot2)
 library(knitr)
 Sys.setlocale("LC_ALL","English")
+```
+
+```
+## [1] "LC_COLLATE=English_United States.1252;LC_CTYPE=English_United States.1252;LC_MONETARY=English_United States.1252;LC_NUMERIC=C;LC_TIME=English_United States.1252"
+```
+
+```r
 ds <- read.csv("activity.csv")
 ds$date <- as.Date(ds$date)
 ```
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 histdata = na.omit(ds)  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
 
 hist(histdata$n_steps,
@@ -42,13 +40,21 @@ hist(histdata$n_steps,
      breaks = 8)
 ```
 
-```{r}
-data.frame(mean = mean(histdata$n_steps),median = median(histdata$n_steps))
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
+
+```r
+data.frame(mean = mean(histdata$n_steps),median = median(histdata$n_steps))
+```
+
+```
+##       mean median
+## 1 10766.19  10765
 ```
 
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 ques2 = ds  %>%
   group_by(interval)  %>% 
   summarise(avg_steps = mean(steps,na.rm = T))
@@ -59,34 +65,50 @@ with(ques2,
           ylab = 'Average number of steps'))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 
 
-```{r}
+
+
+```r
 ques2[which.max(ques2$avg_steps),]
+```
+
+```
+## # A tibble: 1 x 2
+##   interval avg_steps
+##      <int>     <dbl>
+## 1      835  206.1698
 ```
 
 ## Imputing missing values with linear regression model
 
 - Number of NAs
-```{r}
+
+```r
 length(ds[is.na(ds$steps),1])
+```
+
+```
+## [1] 2304
 ```
 
 - First, I run a linear regression model with `lm()`
 - Then use 'date' and 'interval' to predict 'steps' with NAs
-```{r}
+
+```r
 ds2 = ds
 imput_model = lm(steps~.,ds2 )
 
 ds2[is.na(ds2$steps),1] = predict(imput_model,ds2[is.na(ds2$steps),c(2,3)])
-
 ```
 
 
 
 
-```{r}
+
+```r
 histdata2 = ds2  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
 
 par(mfrow=c(1,2))
@@ -101,8 +123,11 @@ hist(histdata$n_steps,
      breaks = 8)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 ## Weekdays vw Weekends
-```{r}
+
+```r
 ds2 = ds2 %>%
   mutate(days = weekdays(date)) %>% 
   mutate(days = ifelse(days %in% c("Saturday","Sunday"),
@@ -123,4 +148,6 @@ ggplot(last,
   theme_dark() + 
   ylab("Average Steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
