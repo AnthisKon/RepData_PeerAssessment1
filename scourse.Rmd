@@ -1,8 +1,13 @@
 ---
 title: "PA1_template"
 author: "Konstantinos"
-date: "21 ���������� 2017"
-output: html_document
+date: "23 December 2017"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+    theme: spacelab
 ---
 
 ```{r setup, include=FALSE}
@@ -16,8 +21,11 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 ## Loading and preprocessing the data
 
-```{r}
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
 library(dplyr)
+library(ggplot2)
+library(knitr)
+Sys.setlocale("LC_ALL","English")
 ds <- read.csv("activity.csv")
 ds$date <- as.Date(ds$date)
 ```
@@ -27,7 +35,10 @@ ds$date <- as.Date(ds$date)
 ```{r}
 histdata = na.omit(ds)  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
 
-hist(histdata$n_steps,main = 'Total number of steps taken each day', xlab = 'Total number of steps',breaks = 8)
+hist(histdata$n_steps,
+     main = 'Total number of steps taken each day',
+     xlab = 'Total number of steps',
+     breaks = 8)
 ```
 
 ```{r}
@@ -37,8 +48,14 @@ data.frame(mean = mean(histdata$n_steps),median = median(histdata$n_steps))
 
 ## What is the average daily activity pattern?
 ```{r}
-ques2 = ds  %>% group_by(interval)  %>% summarise(avg_steps = mean(steps,na.rm = T))
-with(ques2,plot(avg_steps~interval,type = 'l',ylab = 'Average number of steps'))
+ques2 = ds  %>%
+  group_by(interval)  %>% 
+  summarise(avg_steps = mean(steps,na.rm = T))
+
+with(ques2,
+     plot(avg_steps~interval,
+          type = 'l',
+          ylab = 'Average number of steps'))
 ```
 
 
@@ -55,11 +72,12 @@ ques2[which.max(ques2$avg_steps),]
 length(ds[is.na(ds$steps),1])
 ```
 
-- First, I run a linear regression model with `r lm()`
+- First, I run a linear regression model with `lm()`
 - Then use 'date' and 'interval' to predict 'steps' with NAs
 ```{r}
 ds2 = ds
 imput_model = lm(steps~.,ds2 )
+
 ds2[is.na(ds2$steps),1] = predict(imput_model,ds2[is.na(ds2$steps),c(2,3)])
 
 ```
@@ -71,11 +89,37 @@ ds2[is.na(ds2$steps),1] = predict(imput_model,ds2[is.na(ds2$steps),c(2,3)])
 histdata2 = ds2  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
 
 par(mfrow=c(1,2))
-hist(histdata2$n_steps,main = 'Imputed NAs ', xlab = 'Total number of steps',breaks = 8)
+hist(histdata2$n_steps,
+     main = 'Imputed NAs ', 
+     xlab = 'Total number of steps',
+     breaks = 8)
 
-hist(histdata$n_steps,main = 'Data with NAs ', xlab = 'Total number of steps',breaks = 8,)
+hist(histdata$n_steps,
+     main = 'Data with NAs ', 
+     xlab = 'Total number of steps',
+     breaks = 8)
 ```
 
 ## Weekdays vw Weekends
+```{r}
+ds2 = ds2 %>%
+  mutate(days = weekdays(date)) %>% 
+  mutate(days = ifelse(days %in% c("Saturday","Sunday"),
+                       'weekend',
+                       'weekday')) %>% 
+  mutate(days=as.factor(days))
 
+last= ds2  %>%
+  group_by(interval,days)  %>% 
+  summarise(avg_steps = mean(steps))
+
+ggplot(last,
+       aes(x=interval,
+           y=avg_steps)) + 
+  facet_wrap(~days,
+             nrow = 2) +
+  geom_line() +
+  theme_dark() + 
+  ylab("Average Steps")
+```
 
