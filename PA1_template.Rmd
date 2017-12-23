@@ -1,5 +1,5 @@
 ---
-title: "PA1_template"
+title: "Peer Graded Assessment_Coursera Course"
 author: "Konstantinos"
 date: "23 December 2017"
 output: 
@@ -35,7 +35,10 @@ ds$date <- as.Date(ds$date)
 
 ```{r}
 histdata = na.omit(ds)  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
+# simple ggplot
+ggplot(histdata)+geom_histogram(aes(n_steps),bins = 8)
 
+#base plot
 hist(histdata$n_steps,
      main = 'Total number of steps taken each day',
      xlab = 'Total number of steps',

@@ -1,4 +1,4 @@
-# PA1_template
+# Peer Graded Assessment_Coursera Course
 Konstantinos  
 23 December 2017  
 
@@ -33,14 +33,21 @@ ds$date <- as.Date(ds$date)
 
 ```r
 histdata = na.omit(ds)  %>% group_by(date)  %>% summarise(n_steps = sum(steps)) 
+# simple ggplot
+ggplot(histdata)+geom_histogram(aes(n_steps),bins = 8)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
+#base plot
 hist(histdata$n_steps,
      main = 'Total number of steps taken each day',
      xlab = 'Total number of steps',
      breaks = 8)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-2-2.png)<!-- -->
 
 
 ```r
